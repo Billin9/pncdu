@@ -8,6 +8,8 @@
 
 
 # 使用方法
+
+```bash
 Usage:
   ./pncdu.py [--debug] [PATH]
 
@@ -18,3 +20,4 @@ Options:
   -h --help              show this help message and exit
   -v --version           show version and exit
   --debug                show all arguments
+ ```
