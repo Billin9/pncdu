@@ -73,11 +73,7 @@ def analyze_data(data, updir=None, bigdirs=None, bigfiles=None):
             if 'dsize' not in i or 'asize' not in i or 'notreg' in i:
                 filesize = 0
             else:
-                # try:
                 filesize = i['dsize']
-                # except KeyError:
-                #    print 'this is error, dirpath: ',dirpath,'and file:',i
-                #    sys.exit(1)
             bigdirs[dirpath] += filesize
             filepath = path.join(dirpath, i['name'])
             bigfiles[filepath] = filesize
@@ -96,6 +92,7 @@ def main():
     for i, d in enumerate(topdirs, 1):
         dirname, bsize = d
         msize = bsize / (1024 * 2)
+        # TODO(Bai): 可以根据文件大小显示相对应的单位
         print 'TOP.{} Dirname: {}, Size: {}M'.format(i, dirname, msize)
 
     print "\n=== Maximum Files TOP 10 ==="
