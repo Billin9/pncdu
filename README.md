@@ -11,7 +11,10 @@
 
 ```bash
 Usage:
-  ./pncdu.py [--debug] [PATH]
+  ./{} [--debug] [PATH]
+
+DESCRIPTION
+  A command line tool based on the ncdu to locate files and directories that take up more space in the file system
 
 Arguments:
   PATH    Scan files in the given path (the current directory by default).
