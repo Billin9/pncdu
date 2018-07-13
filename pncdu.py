@@ -18,6 +18,8 @@ doc = """
 Usage:
   ./{} [--debug] [PATH]
 
+基于 ncdu 实现的一个命令行工具，用来定位文件系统中占用了较大空间的文件、目录
+
 Arguments:
   PATH    Scan files in the given path (the current directory by default).
 
