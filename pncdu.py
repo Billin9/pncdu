@@ -47,15 +47,10 @@ def run(cmd):
     rc = rt.returncode
     if rc != 0:
         print 'command execute failed: ', cmd
-        print '==== error ====\n', stderr
+        print '=== error ===\n', stderr
         sys.exit(rc)
-    return stdout
-
-
-def load_data(data):
-    pdata = json.loads(data, encoding='latin1')[-1]
-    # print json.dumps(pdata, indent=4)
-    return analyze_data(pdata)
+    data = json.loads(stdout, encoding='latin1')[-1]
+    return data
 
 
 def analyze_data(data, updir=None, bigdirs=None, bigfiles=None):
@@ -91,10 +86,20 @@ def analyze_data(data, updir=None, bigdirs=None, bigfiles=None):
 def main():
     args = docopt(doc, version='2018.07.13')
     ncdudata = run(cmd_line(args))
-    bigdirs, bigfiles = load_data(ncdudata)
-    topdirs = Counter(bigdirs).most_common()[0:9]
-    topfiles = Counter(bigfiles).most_common()[0:9]
-    print topdirs, topfiles
+    bigdirs, bigfiles = analyze_data(ncdudata)
+    topdirs = Counter(bigdirs).most_common()[0:10]
+    topfiles = Counter(bigfiles).most_common()[0:10]
+    print "=== Maximum Dirs TOP 10 ==="
+    for i, d in enumerate(topdirs, 1):
+        dirname, bsize = d
+        msize = bsize / (1024 * 2)
+        print 'TOP.{} Dirname: {}, Size: {}M'.format(i, dirname, msize)
+
+    print "=== Maximum Files TOP 10 ==="
+    for i, f in enumerate(topfiles, 1):
+        filename, bsize = f
+        msize = bsize / (1024 * 2)
+        print 'TOP.{} Filename: {}, Size: {}M'.format(i, filename, msize)
 
 
 if __name__ == '__main__':
