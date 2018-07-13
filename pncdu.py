@@ -10,9 +10,9 @@ import sys
 import json
 import subprocess as sp
 from os import path
+from collections import Counter
 
 from docopt import docopt
-
 
 doc = """
 Usage:
@@ -28,13 +28,13 @@ Options:
 """.format(sys.argv[0])
 
 
-def cmd_line(args):
-    if args['--debug']:
-        print(args)
+def cmd_line(params):
+    if params['--debug']:
+        print(params)
         sys.exit(1)
 
-    if args['PATH']:
-        cmd = 'ncdu -o- {}'.format(args['PATH'])
+    if params['PATH']:
+        cmd = 'ncdu -o- {}'.format(params['PATH'])
     else:
         cmd = 'ncdu -o-'
 
@@ -44,35 +44,40 @@ def cmd_line(args):
 def run(cmd):
     rt = sp.Popen(cmd, shell=True, stdout=sp.PIPE, stderr=sp.PIPE)
     (stdout, stderr) = rt.communicate()
-    #if stdout:
-    #    print 'stdout: \n{}'.format(stdout)
-    #if stderr:
-    #    print 'stderr: \n{}'.format(stderr)
     rc = rt.returncode
+    if rc != 0:
+        print 'command execute failed: ', cmd
+        print '==== error ====\n', stderr
+        sys.exit(rc)
     return stdout
 
 
 def load_data(data):
     pdata = json.loads(data, encoding='latin1')[-1]
     # print json.dumps(pdata, indent=4)
-    analyze_data(pdata)
+    return analyze_data(pdata)
 
 
-def analyze_data(data, updir='', bigdirs={}, bigfiles={}):
-    if updir == '':
+def analyze_data(data, updir=None, bigdirs=None, bigfiles=None):
+    if bigdirs is None:
+        bigdirs = {}
+    if bigfiles is None:
+        bigfiles = {}
+    if updir is None:
         dirpath = data[0]['name']
     else:
-        dirpath = path.join(updir,data[0]['name'])
+        dirpath = path.join(updir, data[0]['name'])
 
     bigdirs[dirpath] = data[0].get('asize', 0)
+
     for i in data[1:]:
         if type(i) == dict:
             if 'dsize' not in i or 'asize' not in i or 'notreg' in i:
                 filesize = 0
             else:
-                #try:
+                # try:
                 filesize = i['dsize']
-                #except KeyError:
+                # except KeyError:
                 #    print 'this is error, dirpath: ',dirpath,'and file:',i
                 #    sys.exit(1)
             bigdirs[dirpath] += filesize
@@ -80,13 +85,17 @@ def analyze_data(data, updir='', bigdirs={}, bigfiles={}):
             bigfiles[filepath] = filesize
         else:
             analyze_data(i, dirpath, bigdirs, bigfiles)
-    #print 'dirs: {}'.format(bigdirs)
-    #print 'files: {}'.format(bigfiles)
+    return bigdirs, bigfiles
+
+
+def main():
+    args = docopt(doc, version='2018.07.13')
+    ncdudata = run(cmd_line(args))
+    bigdirs, bigfiles = load_data(ncdudata)
+    topdirs = Counter(bigdirs).most_common()[0:9]
+    topfiles = Counter(bigfiles).most_common()[0:9]
+    print topdirs, topfiles
 
 
 if __name__ == '__main__':
-    args = docopt(doc, version='2018.07.13')
-    ncdudata = run(cmd_line(args))
-    load_data(ncdudata)
-
-# --- pncdu.py --- ends here
+    main()
