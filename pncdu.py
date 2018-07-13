@@ -89,13 +89,13 @@ def main():
     bigdirs, bigfiles = analyze_data(ncdudata)
     topdirs = Counter(bigdirs).most_common()[0:10]
     topfiles = Counter(bigfiles).most_common()[0:10]
-    print "=== Maximum Dirs TOP 10 ==="
+    print "\n=== Maximum Dirs TOP 10 ==="
     for i, d in enumerate(topdirs, 1):
         dirname, bsize = d
         msize = bsize / (1024 * 2)
         print 'TOP.{} Dirname: {}, Size: {}M'.format(i, dirname, msize)
 
-    print "=== Maximum Files TOP 10 ==="
+    print "\n=== Maximum Files TOP 10 ==="
     for i, f in enumerate(topfiles, 1):
         filename, bsize = f
         msize = bsize / (1024 * 2)
